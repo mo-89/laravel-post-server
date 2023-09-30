@@ -16,25 +16,26 @@ class CustomerApiController extends Controller
 
     public function store(Request $request)
     {
-        Log::info(__METHOD__);
+        try {
+            Log::info(__METHOD__);
+            $apiKey = $request->header('x-api-key');
+            $correctKey = 'test';
+            if ($apiKey != $correctKey) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
 
-        $apiKey = $request->header('x-api-key');
+            // バリデーション
+            $validated = $request->validate([
+                'name' => 'required|max:255',
+                'age' => 'required|integer',
+                'memo' => 'nullable|max:500'
+            ]);
 
-        $correctKey = 'test';
-
-        if ($apiKey != $correctKey) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            // データの作成
+            $customer = Customer::create($validated);
+            return response()->json(['message' => 'Successfully created', 'customer' => $customer], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Internal Server Error'], 500);
         }
-
-        $validated = $request->validate([
-            'name' => 'required|max:255',
-            'age' => 'required|integer',
-            'memo' => 'nullable|max:500'
-        ]);
-
-        $customer = Customer::create($validated);
-
-        return response()->json(['message' => 'Successfully created', 'customer' => $customer], 201);
     }
-
 }
