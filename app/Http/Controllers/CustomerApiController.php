@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 
 class CustomerApiController extends Controller
@@ -37,5 +38,37 @@ class CustomerApiController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Internal Server Error'], 500);
         }
+    }
+
+    public function handlePost(Request $request)
+    {
+        Log::info(__METHOD__);
+        return response('', 307)->header('Location', '/api/do-nothing');
+    }
+
+    public function doNothing(Request $request)
+    {
+        Log::info(__METHOD__);
+        return response('Temporary Redirect', 307);
+    }
+
+    public function redirect(Request $request)
+    {
+        Log::info(__METHOD__);
+        $response = $this->store($request);
+
+        if ($response->status() === 201) {
+            return redirect('/api/customers')->setStatusCode(307);
+        }
+
+        return $response;
+    }
+
+    public function redirectToStore(Request $request)
+    {
+        Log::info(__METHOD__);
+        // そもそもURLをリダイレクトして、保存処理に成功した際に307を返すのは標準的ではない
+
+        return Redirect::to('/api/customers', 307);
     }
 }

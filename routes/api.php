@@ -19,4 +19,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// endpoint
 Route::post('/customers', [CustomerApiController::class, 'store']);
+
+// redirect to endpoint
+Route::post('/redirect_customers', [CustomerApiController::class, 'redirect']);
+
+Route::post('/handle-post', [CustomerAPiController::class, 'handlePost']);
+
+Route::post('/do-nothing', [CustomerAPiController::class, 'doNothing']);
